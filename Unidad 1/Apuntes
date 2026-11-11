@@ -1,0 +1,350 @@
+NOTAS DE CLASE
+==============================
+CLASE 1 – Microcontroladores y arquitectura: un enfoque moderno
+==============================
+
+¿Qué es un sistema embebido?
+Es un sistema computacional diseñado para ejecutar una tarea o función dedicada en tiempo real. Ejemplos: un termostato, una alarma o el control de un automóvil.
+
+Microcontrolador (MCU)
+- Computadora en un solo chip que cumple una función específica: integra CPU, memoria y periféricos en el mismo silicio.
+- Son de bajo costo y bajo consumo energético.
+- Las aplicaciones complejas suelen usar varios microcontroladores coordinados por un orquestador principal.
+
+Microcontrolador vs. Microprocesador
+- Integración: el microcontrolador tiene CPU, memoria y periféricos en el mismo chip; el microprocesador solo contiene la CPU y requiere componentes externos en la placa (RAM, almacenamiento, E/S).
+- Memoria: interna (Flash, SRAM) en el microcontrolador; externa en el microprocesador.
+- Costo: muy bajo / alto.
+- Consumo: muy bajo (miliamperios o microamperios) / alto (requiere disipación activa).
+- Aplicación: control dedicado, embebido (sistemas específicos) / propósito general (PC, servidores).
+- Velocidad: moderada (hasta unos 400 MHz) / alta (1 GHz a 5 GHz).
+
+Notas sueltas sobre niveles lógicos
+- Datasheet y umbrales TTL/CMOS: en la hoja de datos se revisan los voltajes de entrada V_IL (voltaje máximo para un 0 lógico) y V_IH (voltaje mínimo para un 1 lógico) para garantizar el paso de corriente y la interpretación correcta de estados lógicos.
+- Estados lógicos: 1 (Alto / High) o 0 (Bajo / Low). Entre V_IL y V_IH se encuentra la zona de incertidumbre.
+- Lógica combinacional vs. secuencial: la combinacional depende solo de las entradas actuales (compuertas AND, OR). La secuencial depende de las entradas y del estado anterior (memoria, flip-flops, contadores).
+- Bit de acarreo (Carry): se almacena en un flip-flop dentro del registro de estado (Status Register / SREG) del CPU.
+- Ancho de palabra: los microcontroladores estándar trabajan con procesadores de 8, 16 o 32 bits.
+- Módulos comerciales: se adquieren como chips sueltos o en placas de desarrollo (como el ESP32). ¿Cuál comprar? Depende de si se requiere conectividad (Wi-Fi/Bluetooth), cantidad de pines GPIO, velocidad de reloj y presupuesto energético.
+
+Memoria en un microcontrolador
+Es el componente hardware que almacena datos e instrucciones ejecutables necesarias para la CPU. Sin memoria, el procesador no posee un flujo secuencial de operaciones a realizar ni capacidad de mantener variables durante el tiempo de ejecución.
+
+Respuestas a "Por investigar":
+- ¿Qué es la memoria? Tipos: es un arreglo de celdas binarias direccionables.
+  * SRAM (Static RAM): volátil, muy rápida, basada en flip-flops. Almacena variables de ejecución.
+  * Flash: no volátil, basada en transistores de compuerta flotante. Guarda el programa compilado (código binario).
+  * EEPROM: no volátil, lecturas/escrituras a nivel de byte. Ideal para parámetros de configuración que deben sobrevivir a reinicios.
+  * ROM / EPROM: memorias de solo lectura (antiguas o para arranque/bootloader). La EPROM se borraba con luz ultravioleta.
+- Relación con el bus de datos: el bus de datos determina cuántos bits se pueden leer o escribir simultáneamente desde/hacia la memoria en un ciclo de reloj.
+
+==============================
+CLASE 2 – Electricidad y fundamentos
+==============================
+
+- Lógica binaria: 1 es SÍ (tensión / estado alto), 0 es NO (tierra / estado bajo).
+- Señales:
+  * Analógica: varía de forma continua en el tiempo (ej. sensores de temperatura, fuentes de energía sin regular).
+  * Digital: varía en valores discretos/finitos (0 V o VDD).
+- Tipos de corriente:
+  * DC (Direct Current / Corriente Directa): su polaridad y magnitud no cambian con respecto al tiempo (baterías, salidas reguladas de MCU).
+  * AC (Alternating Current / Corriente Alterna): su magnitud y dirección varían cíclicamente en el tiempo (red eléctrica de pared).
+- Práctica esencial: Ley de Ohm (V = I * R), despejar fórmulas y convertir unidades (miliamperios, microfaradios, megahercios).
+
+Michael Faraday (1791–1867)
+- Creador de los fundamentos del electromagnetismo y la inducción electromagnética.
+- Nació en 1791; de origen humilde, mostró poca instrucción escolar formal temprana y aprendió de forma autodidacta encuadernando libros.
+- Su fe cristiana influyó profundamente en su ética de trabajo e investigación.
+- Ingresó a la Royal Institution de Londres como asistente de Humphry Davy.
+- Llevaba cuadernos detallados de anotaciones de todos sus experimentos.
+- Sufrió un accidente químico en el laboratorio con tricloruro de nitrógeno que le afectó temporalmente la vista.
+- Contrajo matrimonio con Sarah Barnard (Sarah Faraday).
+- Diseñó el primer dispositivo de rotación electromagnética (el antecesor del motor eléctrico).
+- Le encomendaron la tarea de perfeccionar el vidrio óptico; aunque consideró que fracasó, conservó un trozo de vidrio denso de borosilicato de plomo como recordatorio.
+- A partir de ese trozo de vidrio descubrió años más tarde el Efecto Faraday (la rotación de la polarización de la luz por un campo magnético).
+- Creó las Christmas Lectures en la Royal Institution para la divulgación científica.
+- En la etapa madura de su vida padeció pérdida progresiva de memoria y deterioro del sistema nervioso.
+- Estudió cómo se interrelacionan las fuerzas invisibles: magnetismo, electricidad y luz.
+
+Ideas clave
+- Una ecuación física representa una realidad o fenómeno del mundo material.
+- La información electromagnética se propaga mediante ondas a la velocidad de la luz en el vacío (c ≈ 3 x 10^8 m/s).
+- La matemática es el lenguaje formal de la ciencia e ingeniería.
+- Manejo riguroso de notación científica y magnitudes eléctricas básicas (Voltios, Amperios, Ohmios, Faradios, Henrios).
+
+==============================
+CLASE 3 – Herramientas del microcontrolador
+==============================
+
+Arquitecturas de procesador
+- RISC (Reduced Instruction Set Computer): conjunto reducido de instrucciones de ejecución rápida (generalmente 1 ciclo de reloj por instrucción). Más eficiente en consumo energético, menos compleja en hardware (ejemplo: AVR, ARM, ESP32/Xtensa).
+- CISC (Complex Instruction Set Computer): conjunto amplio de instrucciones complejas donde una sola instrucción realiza múltiples operaciones internas. Circuitos más complejos y de mayor costo (ejemplo: arquitecturas x86 de Intel/AMD).
+
+Instrucciones en Ensamblador (Arquitectura AVR)
+- LDI (Load Immediate): carga un valor constante de 8 bits directamente en un registro de trabajo (ej. LDI R16, 0xFF).
+- ADD: suma el contenido de dos registros y guarda el resultado en el primero. Si ocurre un desbordamiento, levanta la bandera de acarreo (C) en el registro de estado.
+- SBI (Set Bit in I/O Register): pone en '1' un bit específico dentro de un registro de E/S.
+  * Ejemplo: SBI 0x05, 5 escribe un '1' en el bit 5 del registro 0x05 (que corresponde a PORTB en el ATmega328P).
+- CBI (Clear Bit in I/O Register): pone en '0' un bit específico dentro de un registro de E/S.
+  * Ejemplo: CBI 0x05, 5 escribe un '0' en el bit 5 del registro 0x05.
+- RJMP (Relative Jump): salto relativo a otra dirección de memoria de programa (adelante o atrás en el flujo del código).
+
+Niveles de abstracción del lenguaje
+1. Lenguaje C / C++ (Alto Nivel): PORTB |= (1 << 5);  (Legible para el humano, portable).
+2. Lenguaje Ensamblador (Bajo Nivel): SBI 0x05, 5  (Mapeo directo instrucción-máquina).
+3. Lenguaje Máquina (Binario): 1101110101010111  (Instrucciones codificadas en bits guardadas en la memoria Flash).
+4. Capa Física: pulsos eléctricos de 0 V y 5 V (o 3.3 V) que conmutan transistores dentro del chip.
+
+==============================
+CLASE 4 – Buses, memorias y periféricos
+==============================
+
+Los tres buses del sistema
+- Bus de direcciones: define a qué celda de memoria o periférico se quiere acceder (¿En qué casillero?).
+- Bus de datos: transporta la información real que se escribe o se lee (El contenido).
+- Bus de control: transporta las señales que coordinan la operación (¿Leer o escribir? Señales de reloj, habilita escritura/lectura).
+
+Ejemplo de ciclo de escritura y lectura
+Escritura del dato 0010 0000 (0x20) en la dirección 0x25:
+1. La CPU coloca la dirección 0x25 en el bus de direcciones.
+2. La CPU pone el valor 0010 0000 en el bus de datos.
+3. La CPU activa la línea de "Escritura" (Write / WE) en el bus de control.
+4. El módulo de memoria almacena los 8 bits en la dirección 0x25.
+
+Lectura: se coloca la dirección 0x25 en el bus de direcciones, se activa "Lectura" (Read / OE) en el bus de control y la memoria coloca el valor almacenado en el bus de datos para que la CPU lo procese.
+
+Arquitecturas de memoria: Von Neumann vs. Harvard
+- Von Neumann: usa un mismo bus de direcciones y datos para compartir las instrucciones de programa y los datos. Provoca un "cuello de botella" porque la CPU no puede leer una instrucción y un dato al mismo tiempo.
+- Harvard: posee buses separados físicamente para la memoria de programa y la memoria de datos. Permite leer una instrucción y acceder a una variable de datos en el mismo ciclo de reloj (mayor velocidad de ejecución).
+
+Tipos de memoria interna
+- Memoria Flash: no volátil. Guarda el programa compilado. Permite reescrituras (limitadas a aprox. 10.000–100.000 ciclos de borrado).
+- Memoria SRAM: volátil. Es rápida, de acceso inmediato y guarda las variables y la pila (stack) mientras el microcontrolador está encendido.
+- Memoria EEPROM: no volátil. Se puede escribir y borrar a nivel de byte individual. Soporta más ciclos de escritura (aprox. 100.000 a 1.000.000), pero es lenta. Ideal para guardar calibraciones o configuraciones.
+
+Unidades de almacenamiento
+- 1 Byte = 8 bits
+- 1 KB (Kilobyte) = 1024 Bytes = 2^10 Bytes
+- 1 MB (Megabyte) = 1024 KB = 2^20 Bytes
+
+Comparativa de hardware: ATmega328P vs. ESP32
+- Memoria Flash: 32 KB (interna) / 4 MB (normalmente externa en chip SPI).
+- Memoria SRAM: 2 KB / ~520 KB.
+- Memoria EEPROM: 1 KB (física) / No tiene EEPROM física (se emula en una partición Flash con la librería Preferences/EEPROM).
+
+Consideraciones prácticas de memoria
+- Capacidad de SRAM: 2 KB equivalen a 2048 Bytes. Si un número entero (int) en sistemas de 8 bits ocupa 2 bytes, guardar un arreglo de 2000 enteros requeriría 4000 bytes, sobrepasando la SRAM disponible en un ATmega328P.
+- Desgaste de celdas: escribir en Flash/EEPROM implica un proceso físico que degrada la capa de óxido del transistor de compuerta flotante. Regla de oro: jamás colocar una instrucción de escritura en EEPROM o Flash dentro de un bucle while(1) o loop() sin una condición de disparo.
+- Asignación: el código ejecutable de un sistema (ej. lógica de control de un semáforo) se almacena en la memoria Flash.
+
+Periféricos integrados
+Son bloques de hardware especializado independientes de la CPU que realizan tareas específicas:
+- GPIO (General Purpose Input/Output): pines configurables para leer o escribir estados digitales.
+- Timers: contadores por hardware para medir tiempo, generar eventos periódicos o contar pulsos externos.
+- Interrupciones: señales que pausan temporalmente la CPU para atender eventos urgentes de hardware.
+- ADC (Analog-to-Digital Converter): convierte un nivel de voltaje analógico en un valor numérico discreto (ej. leer la salida analógica del sensor LM35).
+- DAC (Digital-to-Analog Converter): convierte un valor numérico digital en un nivel de voltaje analógico continuo.
+- PWM (Pulse Width Modulation): modulación por ancho de pulso. Simula una salida analógica mediante la variación del ciclo de trabajo de una señal digital rápida (usado en control de servos o dimmer de LEDs).
+- UART (Universal Asynchronous Receiver-Transmitter): protocolo de comunicación serie asíncrona mediante dos líneas: RX (recepción) y TX (transmisión).
+
+Conceptos de procesamiento
+- Ancho de palabra (bits): tamaño de los datos que la ALU y la CPU pueden procesar en una sola instrucción (8 bits en AVR, 32 bits en ESP32).
+- Número de núcleos: determina la cantidad de hilos o tareas de código que la CPU puede ejecutar de manera físicamente simultánea.
+
+Módulo vs. Placa de desarrollo
+- Chip: el silicio básico (ej. SoC ESP32).
+- Módulo: el chip junto con su memoria Flash externa, cristal de cuarzo y antena sellados bajo un blindaje metálico (ej. ESP32-WROOM-32).
+- Placa de desarrollo: el módulo integrado en un circuito impreso que añade reguladores de voltaje (5 V a 3.3 V), puerto USB, conversor USB-Serial y botones de control (ej. ESP32 DevKit).
+
+Sostenibilidad y selección del microcontrolador
+- Principio del "mínimo suficiente": seleccionar el microcontrolador ajustado a las necesidades reales del proyecto.
+- Si no se requiere Wi-Fi/Bluetooth, el uso de un chip con radios de radiofrecuencia incrementa innecesariamente el consumo de corriente (milliamperios extra) y el impacto de fabricación.
+- En sistemas alimentados por baterías, el consumo en estado de reposo (Sleep modes) es crítico.
+
+Niveles lógicos digitales ("El byte humano")
+- Tensión de operación: sistemas clásicos operan a 5 V (TTL), mientras que sistemas modernos como el ESP32 operan a 3.3 V (CMOS).
+- Zona de incertidumbre: rango de voltaje intermedio entre el máximo considerado "0 lógico" (V_IL) y el mínimo considerado "1 lógico" (V_IH). Si la señal cae en esta zona, el hardware puede interpretar erróneamente el bit.
+
+Operaciones a nivel de bit (Bitwise) y Máscaras
+Operaciones bit a bit aplicadas sobre registros de 8 o 32 bits:
+- AND (&): da 1 solo si ambas entradas son 1. Usada para limpiar o aislar bits.
+- OR (|): da 1 si al menos una entrada es 1. Usada para setear (poner en 1) bits.
+- XOR (^): da 1 si las entradas son distintas. Usada para invertir (toggle) bits específicos.
+- NOT (~): invierte todos los bits de la palabra.
+- Desplazamiento a la izquierda (1 << n): genera una máscara con un '1' posicionado en el índice n.
+  * Ejemplo: 1 << 5 produce el valor binario 00100000 (hexadecimal 0x20).
+
+==============================
+CLASE 5 – Registros de entrada y salida
+==============================
+
+Registros del Puerto B en AVR (ATmega328P)
+- DDRB (Data Direction Register B): configura la dirección del pin.
+  * Bit en 0 = Configurado como Entrada (Input).
+  * Bit en 1 = Configurado como Salida (Output).
+- PORTB (Port B Data Register):
+  * Si el pin está configurado como Salida: bit en 1 saca 5 V (HIGH); bit en 0 saca 0 V (LOW).
+  * Si el pin está configurado como Entrada: bit en 1 activa la resistencia interna de Pull-Up; bit en 0 la deja desactivada (alta impedancia).
+- PINB (Port B Input Pins Address): registro de lectura de solo lectura. Permite leer el nivel de voltaje presente físicamente en los pines del puerto (bit en 1 = HIGH, bit en 0 = LOW).
+
+Predecir el estado del pin
+- DDRB5 = 1, PORTB5 = 1 -> Pin configurado como Salida en nivel Alto (5 V).
+- DDRB5 = 1, PORTB5 = 0 -> Pin configurado como Salida en nivel Bajo (0 V).
+- DDRD2 = 0, PORTD2 = 1 -> Pin configurado como Entrada con Pull-Up interna activada. El estado por defecto es 5 V; para registrar un evento se requiere un pulsador que conecte el pin a Tierra (GND).
+
+Manipulación directa de registros (Receta de bits)
+Para configurar un pin específico (ejemplo: Pin 2 del puerto D) como entrada sin alterar el resto de pines del registro:
+  DDRD &= ~(1 << 2); // Limpia el bit 2 de DDRD (lo pone en 0)
+
+Para configurarlo como salida:
+  DDRD |= (1 << 2);  // Setea el bit 2 de DDRD (lo pone en 1)
+
+==============================
+CLASE 6 – Del AVR al ESP32
+==============================
+
+Comparativa de Arquitectura: ATmega328P vs. ESP32
+- Ancho de palabra: 8 bits / 32 bits.
+- Frecuencia de Reloj y Núcleos: 1 núcleo a 16 MHz / Dual-core 32-bit Xtensa LX6 a 240 MHz.
+- SRAM / Flash: 2 KB SRAM, 32 KB Flash interna / ~520 KB SRAM, 4 MB Flash externa SPI.
+- Tensión lógica de I/O: 5 V (tolerante) / 3.3 V (NO tolerante a 5 V en sus GPIOs).
+- Mapeo Pin <-> Periférico:
+  * AVR: mapeo fijo de hardware (ej. el pin físico PB5 está ligado rígidamente al Bit 5 de PORTB).
+  * ESP32: mapeo flexible a través de la GPIO Matrix (matriz multiplexora interna que permite rutar casi cualquier periférico interno a casi cualquier pin físico).
+
+Componentes de la placa ESP32 DevKit
+- Conector USB y Regulador: entrada de 5 V desde USB (o pin VIN) regulada a 3.3 V requeridos por el módulo.
+- Conversor USB-Serial (CP2102 / CH340): traduce los niveles del bus USB a nivel serial UART para la programación y comunicación con la computadora.
+- Botones de control:
+  * EN / RESET: reinicia el microcontrolador activando la línea de Reset.
+  * BOOT (GPIO0): pone al chip en modo de descarga de firmware de arranque (Bootloader) al momento de reiniciar.
+
+Definición formal de Pin
+Un pin es la terminal metálica física (contacto del encapsulado) que conecta el circuito integrado interno del microcontrolador con el mundo exterior. En bajo nivel, un pin no se modifica enviando comandos genéricos, sino escribiendo o leyendo bits de registros específicos que están mapeados en el espacio de direcciones de memoria del procesador.
+
+Equivalencias de registros: AVR vs. ESP32
+En el ESP32, debido a su arquitectura de 32 bits y para evitar problemas de concurrencia multinúcleo, no se leen y reescriben los mismos registros con máscaras complejas. Se utilizan registros dedicados de Set (W1TS) y Clear (W1TC):
+
+- Dirección (Entrada/Salida):
+  * AVR: DDRB
+  * ESP32: GPIO_ENABLE_REG
+- Escritura en Alto (Set 1s):
+  * AVR: PORTB |= (1 << n)
+  * ESP32: GPIO_OUT_W1TS_REG = (1 << n) (Write 1 to Set: pone en 1 los bits indicados sin tocar los demás).
+- Escritura en Bajo (Clear 1s):
+  * AVR: PORTB &= ~(1 << n)
+  * ESP32: GPIO_OUT_W1TC_REG = (1 << n) (Write 1 to Clear: pone en 0 los bits indicados sin tocar los demás).
+- Lectura de Entradas:
+  * AVR: PINB
+  * ESP32: GPIO_IN_REG
+
+Riesgo de la condición Read-Modify-Write (Lectura-Modificación-Escritura)
+En arquitecturas multihilo o multinúcleo como el ESP32, si el Núcleo 0 y el Núcleo 1 intentan modificar bits del mismo registro al mismo tiempo mediante una instrucción PORT |= MASK (que primero lee, luego aplica el OR y luego escribe), uno de los núcleos puede sobrescribir los cambios del otro. Los registros W1TS y W1TC resuelven esto al ser operaciones atómicas a nivel de hardware.
+
+==============================
+CLASE 7 – Pines y comunicación
+==============================
+
+Strapping Pins en el ESP32
+Son pines específicos (ej. GPIO0, GPIO2, GPIO5, GPIO12, GPIO15) que la lógica de arranque del ESP32 muestrea durante el proceso de encendido o reset (Power-On Reset) para determinar el modo de operación del chip (por ejemplo, si debe arrancar ejecutando el código de la memoria Flash o ingresar al modo de flasheo por UART).
+- Precaución: si se colocan resistencias de pull-down o cargas externas no adecuadas en estos pines, el ESP32 puede fallar al arrancar.
+
+Pines reservados para la Flash
+Los pines GPIO6 a GPIO11 están conectados internamente al chip de memoria Flash SPI en la mayoría de módulos ESP32. No deben utilizarse como GPIOs de propósito general en el diseño de circuitos.
+
+Tipo de almacenamiento static
+Una variable declarada como static dentro de una función conserva su valor en la memoria entre llamadas sucesivas a dicha función, manteniendo su estado sin volver a inicializarse.
+
+==============================
+CLASE 8 – Tipos de datos, temporizadores y tiempo
+==============================
+
+Tipos de datos explícitos (stdint.h)
+Es buena práctica especificar el tamaño y la presencia de signo de las variables:
+- uint8_t: entero sin signo de 8 bits (Rango: 0 a 255).
+- uint16_t: entero sin signo de 16 bits (Rango: 0 a 65.535).
+- uint32_t: entero sin signo de 32 bits (Rango: 0 a 4.294.967.295).
+
+Problema del desbordamiento (Overflow)
+  uint8_t x = 200, y = 100;
+  uint8_t r = x + y; // 300 excede 255. El resultado en 8 bits es (300 % 256) = 44.
+
+Temporizadores por Hardware (Timers)
+Un temporizador es un periférico de hardware independiente dentro del microcontrolador compuesto por un registro contador que se incrementa o decrementa de manera síncrona con los impulsos de una señal de reloj.
+
+Bloqueo por delay() vs. Temporización no bloqueante con millis()
+- delay(ms): pausa la ejecución del procesador en un bucle cerrado. La CPU no realiza ninguna otra tarea de procesamiento de código durante este periodo.
+- millis(): devuelve un contador de milisegundos desde que arrancó el programa (usando un temporizador por hardware interno). Permite estructurar código asíncrono comprobando diferencias de tiempo transcurrido sin detener la ejecución del bucle loop().
+
+Estructura de funcionamiento de un Timer
+1. Reloj Base: el microcontrolador provee una frecuencia base de reloj (ej. APB bus a 80 MHz en el ESP32).
+2. Prescaler (Prescalador): circuito divisor de frecuencia por hardware. Si se configura un prescaler de N, el contador del timer se incrementa una vez cada N pulsos de la señal de reloj base.
+3. Resolución (Tick): el periodo o duración de tiempo de un incremento (tick) del contador.
+   Resolución (segundos) = Prescaler / Frecuencia de Reloj Base
+4. Alarma / Registro de Comparación: valor numérico cargado en un registro del temporizador. Cuando el valor del contador iguala al registro de alarma, se genera un evento o interrupción.
+
+Fórmulas de cálculo de Timer
+  Tiempo de Alarma = Ticks de Alarma * Resolución
+  Ticks de Alarma = Tiempo deseado / Resolución
+
+Autorrecarga vs. Desbordamiento (Overflow)
+- Autorrecarga (Auto-reload): al alcanzar el valor del registro de comparación o alarma, el contador se reinicia automáticamente a cero por hardware y continúa contando de forma periódica.
+- Desbordamiento (Overflow): ocurre cuando el contador alcanza su capacidad física máxima dada por su cantidad de bits (2^n - 1) y vuelve a cero por no haber sido detenido ni comparado. En un temporizador de 16 bits el máximo es 65.535; en uno de 64 bits (como los del ESP32) es 2^64 - 1.
+
+==============================
+CLASE 9 – Interrupciones y la rutina ISR
+==============================
+
+Sondeo (Polling) vs. Interrupciones
+- Sondeo (Polling): método en el que la CPU pregunta repetidamente mediante código en el bucle principal si la condición de un periférico o pin ha cambiado. Consume ciclos de CPU y puede perder eventos si el bucle tarda en responder.
+- Interrupción (Interrupt): mecanismo por hardware donde un evento interno o externo suspende inmediatamente el flujo normal de ejecución de la CPU, forzándola a saltar a una función especial llamada ISR para atender el evento y luego retornar exactamente al punto de interrupción.
+
+Rutina de Servicio de Interrupción (ISR - Interrupt Service Routine)
+- Es la función que se ejecuta de forma automática al dispararse la interrupción.
+- Reglas críticas para una ISR:
+  1. Debe ser lo más rápida y breve posible.
+  2. No debe incluir funciones bloqueantes (como delay()).
+  3. No debe realizar impresiones por puerto serie (Serial.print()), ya que las transmisiones UART dependen de interrupciones que suelen estar deshabilitadas durante la ejecución de la ISR.
+
+Modos de disparo de Interrupciones Externas
+- RISING: se dispara en el flanco de subida de la señal (transición de 0 a 1 lógico).
+- FALLING: se dispara en el flanco de bajada de la señal (transición de 1 a 0 lógico).
+- CHANGE: se dispara en cualquier cambio de nivel en el pin (0 a 1 o 1 a 0).
+- LOW: se dispara continuamente mientras el pin permanezca en nivel lógico bajo (0 V).
+
+El rebote mecánico (Bounce)
+Al presionar o soltar un botón físico, los contactos metálicos rebotan mecánicamente durante unos milisegundos generando una serie de conmutaciones falsas muy rápidas. Si el pin está configurado con interrupciones, la ISR se disparará múltiples veces por un solo movimiento del usuario. Se mitiga mediante un filtro de hardware (condensador) o por software (validando el tiempo entre disparos con millis()).
+
+Declaración de variables: El modificador volatile
+Cuando una variable se comparte entre una rutina de interrupción (ISR) y el bucle principal (loop()), debe declararse obligatoriamente con el modificador volatile:
+
+  volatile bool eventoDetectado = false;
+
+Esto le indica al compilador de C/C++ que no optimice la variable guardándola en registros del procesador, sino que la lea directamente de la memoria RAM en cada acceso, garantizando que el bucle loop() perciba los cambios hechos por la ISR inmediatamente.
+
+Atributo IRAM_ATTR en el ESP32
+En el ESP32, el código del programa reside habitualmente en la memoria Flash externa SPI. Al ocurrir una interrupción, leer la ISR desde la memoria Flash puede ser lento o fallar si el controlador de Flash está ocupado escribiendo datos (causando un error de tipo Guru Meditation Error / pánico del sistema).
+Anteponer la etiqueta IRAM_ATTR antes de la definición de la ISR le indica al compilador que instale esa función directamente en la memoria SRAM de instrucciones del procesador (IRAM), garantizando una ejecución inmediata a alta velocidad.
+
+Ejemplo completo de patrón bandera:
+
+  volatile bool eventoDetectado = false;
+
+  void IRAM_ATTR isrBoton() {
+      eventoDetectado = true; // Solo cambia una bandera (flag)
+  }
+
+  void setup() {
+      pinMode(21, INPUT_PULLUP);
+      attachInterrupt(digitalPinToInterrupt(21), isrBoton, FALLING);
+  }
+
+  void loop() {
+      if (eventoDetectado) {
+          eventoDetectado = false;
+          // Procesamiento pesado fuera de la ISR
+      }
+  }
+
+Watchdog Timer (WDT)
+Es un temporizador por hardware dedicado cuya función es actuar como sistema de supervisión. Durante la ejecución normal del programa, la CPU debe recargar periódicamente el valor del Watchdog (operación conocida como "alimentar al perro"). Si el programa se cuelga en un bucle infinito o se congela, el temporizador del Watchdog alcanza su desbordamiento e impone un reinicio por hardware al microcontrolador para restablecer el sistema.
